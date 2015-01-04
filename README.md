@@ -17,11 +17,11 @@ Include Script on your site.
 
 src="http://code.jquery.com/jquery-1.11.1.min.js"
 src="http://beeconjs.com/socket.io/socket.io.js"
-src="http://beeconjs.com/lib/beecon-0.1.1.js"
+src="http://beeconjs.com/js/beecon-0.1.1.js"
 
-src="http://beeconjs.com/lib/beecon-0.1.0.js?region=asia"
+src="http://asia.beeconjs.com/js/beecon-0.1.0.js?region=asia"
 //this is strict option to asia region. 
-script src="http://beeconjs.com/lib/beecon-0.1.0.js?badge=true"
+script src="http://beeconjs.com/js/beecon-0.1.0.js?badge=true"
 //this is badge option to display icon. 
 
 ## Usage
