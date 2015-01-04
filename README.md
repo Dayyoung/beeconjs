@@ -13,14 +13,19 @@ This is  BeeconJS Javascript Library for web.
 
 ## Installation
 
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-<script src="http://beeconjs.com/socket.io/socket.io.js"></script>
-<script src="http://beeconjs.com/lib/beecon-0.1.0.js"></script>
+		<div class="container"><div class="line"><code><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"http://code.jquery.com/jquery-1.11.1.min.js"</span>&gt;</span><span class="javascript"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></code></div></div>
 
-<script src="http://beeconjs.com/lib/beecon-0.1.0.js?region=asia"></script>
-//this is strict option to asia region. 
-<script src="http://beeconjs.com/lib/beecon-0.1.0.js?badge=true"></script>
-//this is badge option to display icon. 
+		<div class="container"><div class="line"><code><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"http://beeconjs.com/socket.io/socket.io.js"</span>&gt;</span><span class="javascript"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></code></div></div>
+
+		<div class="container"><div class="line"><code><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"http://beeconjs.com/lib/beecon-0.1.0.js"</span>&gt;</span><span class="javascript"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></code></div></div>
+
+		<br>
+		<div class="container"><div class="line"><code><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"http://beeconjs.com/lib/beecon-0.1.0.js&#63;<font color="red">region=asia</font>"</span>&gt;</span><span class="javascript"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></code></div></div>
+		<font color="red">//this is strict option to asia region.</font>
+
+		<br>
+		<div class="container"><div class="line"><code><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"http://beeconjs.com/lib/beecon-0.1.0.js&#63;<font color="red">badge=true</font>"</span>&gt;</span><span class="javascript"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></code></div></div>
+		<font color="red">//this is badge option to display icon.</font>
 
 ## Usage
 		
