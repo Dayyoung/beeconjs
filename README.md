@@ -20,9 +20,9 @@ src="http://beeconjs.com/socket.io/socket.io.js"<br>
 src="http://beeconjs.com/js/beecon-0.1.1.js"<br>
 
 src="http://asia.beeconjs.com/js/beecon-0.1.0.js?region=asia"<br>
-//this is strict option to asia region. 
+//this is strict option to asia region.<br>
 script src="http://beeconjs.com/js/beecon-0.1.0.js?badge=true"<br>
-//this is badge option to display icon. 
+//this is badge option to display icon.<br>
 
 ## Usage
 
