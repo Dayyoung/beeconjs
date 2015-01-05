@@ -13,19 +13,20 @@ This is  BeeconJS Javascript Library for web.
 
 ## Installation
 
-Include Script on your site.
+include scripts on your site.
 
-src="http://code.jquery.com/jquery-1.11.1.min.js"
-src="http://beeconjs.com/socket.io/socket.io.js"
-src="http://beeconjs.com/js/beecon-0.1.1.js"
+src="http://code.jquery.com/jquery-1.11.1.min.js"<br>
+src="http://beeconjs.com/socket.io/socket.io.js"<br>
+src="http://beeconjs.com/js/beecon-0.1.1.js"<br>
 
-src="http://asia.beeconjs.com/js/beecon-0.1.0.js?region=asia"
+src="http://asia.beeconjs.com/js/beecon-0.1.0.js?region=asia"<br>
 //this is strict option to asia region. 
-script src="http://beeconjs.com/js/beecon-0.1.0.js?badge=true"
+script src="http://beeconjs.com/js/beecon-0.1.0.js?badge=true"<br>
 //this is badge option to display icon. 
 
 ## Usage
-		
+
+on ready HTML Document.
 
 var BeeconBee = new Bee('BeeconJS.com',1);
 //inflate Bee.
