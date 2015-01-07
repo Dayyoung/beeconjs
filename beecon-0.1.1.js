@@ -224,31 +224,33 @@ function createConnection(){
 
 socket = io.connect(ServerUrl,{'forceNew':true });
 
-socket.on('connect', function (data) {         
-  try{ 
-    serverOn(ServerUrl);
-    for(var i  in Bees)
-    {
-      var initBee = function (BEECODE,position)
-      {  
-        try{
-          onRecivedBeecode(BEECODE);
-          }
-          catch(e){}
-        Bees[position].BEECODE = BEECODE+""+Bees[position].key;
-        socket.emit('makeBee', {'roomName': Bees[position].BEECODE , "roomTitle" : Bees[position].url , "master":true}); 
+socket.on('connect', function (data) {  
 
-        if(scriptParam.badge)
-        {
-          var TopMargin = 250 + (100*position);
-          var goUrl = ServerUrl+"/bee/"+Bees[position].BEECODE;
-          $(document.body).append('<div onclick=popupPhone("'+goUrl+'") style="width:70px;height:70px;margin-top:'+TopMargin+'px;position: fixed;right:0;" ><center><img style="width:60px;height:55px;" src="'+ServerUrl+'/img/beebanner.png"></img><br><font color="red" size="1">'+Bees[position].url+'</font></center></div>');
-        }
-      };
-      getBEECODE(initBee,i);
-    }
+  try{  
+    serverOn(ServerUrl);
   }
   catch(e){}
+
+  for(var i  in Bees)
+  {
+    var initBee = function (BEECODE,position)
+    {  
+      try{
+        onRecivedBeecode(BEECODE);
+        }
+        catch(e){}
+      Bees[position].BEECODE = BEECODE+""+Bees[position].key;
+      socket.emit('makeBee', {'roomName': Bees[position].BEECODE , "roomTitle" : Bees[position].url , "master":true}); 
+
+      if(scriptParam.badge)
+      {
+        var TopMargin = 250 + (100*position);
+        var goUrl = ServerUrl+"/bee/"+Bees[position].BEECODE;
+        $(document.body).append('<div onclick=popupPhone("'+goUrl+'") style="width:70px;height:70px;margin-top:'+TopMargin+'px;position: fixed;right:0;" ><center><img style="width:60px;height:55px;" src="'+ServerUrl+'/img/beebanner.png"></img><br><font color="red" size="1">'+Bees[position].url+'</font></center></div>');
+      }
+    };
+    getBEECODE(initBee,i);
+  }
 });
   socket.on('disconnect', function (data) {  
   try{  
