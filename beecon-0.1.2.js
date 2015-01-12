@@ -1,5 +1,5 @@
  /* 
- BeeconJS JavaScript Library v0.1.1
+ BeeconJS JavaScript Library v0.1.2
  http://beeconjs.com/
  
  Copyright 2015, Dayyoung You
@@ -13,6 +13,7 @@ var Bee = function (url, key) {
   this.BEECODE = null;
   this.buttonList = [];
   Bees.push(this);
+  this.data = null;
 }
 
 var BeeButton = function(mark,action) {
@@ -23,6 +24,11 @@ var BeeButton = function(mark,action) {
 Bee.prototype.addButton = function(position,mark,action)
 {
   this.buttonList[position-1]= new BeeButton(mark,action);
+}
+
+Bee.prototype.addData = function(data)
+{
+  this.data= data;
 }
 
 function getBeeByBEECODE(BEECODE)
@@ -68,6 +74,19 @@ function sayBee(BEECODE , sendFunction)
     socket.emit('sayBee', {'BEECODE': BEECODE , 'functionCall': functionCall ,'functionData': functionData });
 }
 
+function sayBeeCallback(BEECODE , sendFunction)
+{  
+    var functionName = getFunctionName(sendFunction);    
+    var functionParam = getFunctionParam(sendFunction);
+    var functionCall = getFunctionCall(functionName,functionParam);
+    socket.emit('sayBeeCallback', {'BEECODE' : BEECODE , 'functionCall': functionCall});
+}
+
+function clickBee(BEECODE,postion)
+{    
+    socket.emit('clickBee', { 'click' : postion  , 'BEECODE' : BEECODE});
+}
+
 //getParams("beecon.js");
 // Extract "GET" parameters from a JS include querystring
 function getParams(script_name) {
@@ -101,7 +120,7 @@ function getParams(script_name) {
 */
 
 var socket;
-var scriptParam = getParams("beecon");
+var scriptParam = getParams("beecon-");
 var BaseUrl = "http://www.beeconjs.com";  
 var ServerUrl = "http://www.beeconjs.com";
 
@@ -123,7 +142,13 @@ $(function() {
   if(scriptParam.region=="asia")
     getBEESERVERList(findBestSever);  
   else    
-    createConnection();
+  {
+    if(!scriptParam.bee)
+      createConnection();
+    else
+      createConnectionByBee();
+  }
+    
 });
 
 function findBestSever(BEESERVER)
@@ -144,9 +169,12 @@ function findBestSever(BEESERVER)
       ServerUrl = obj.url;
     }
   }); 
-  //alert(ServerUrl);
-  createConnection();
-
+  //alert(ServerUrl); 
+  if(!scriptParam.bee)
+    createConnection();
+  else
+    createConnectionByBee();
+      
   try{
     onFindServer();
     }
@@ -174,7 +202,7 @@ function getBEESERVERList(findBestSever)
                  BEESERVER=data.result.BeeServerList;      
                  findBestSever(BEESERVER);            
           },
-          error:function(request,status,error){alert('fail to load!');} 
+          error:function(request,status,error){alert('fail to load!1');} 
   });
   return BEESERVER;
 }
@@ -193,11 +221,11 @@ function getTimeOut(TestUrl)
                 //console.log(TestUrl+ ">>>"+time);
                 BestList.push({url:TestUrl,time:time});       
           },
-          error:function(request,status,error){alert('fail to load!');} 
+          error:function(request,status,error){alert('fail to load!2');} 
   });
 }
 
-function getBEECODE(initBee,position)
+function getBEECODE(initBee)
 {
   $.ajax({
           url     : ServerUrl+""+'/getBEECODE',
@@ -208,10 +236,28 @@ function getBEECODE(initBee,position)
           timeout: 5000,
           success : function(data) {
                  //alert(data.result.BEECODE);  
-                 initBee(data.result.BEECODE,position);              
+                 initBee(data.result.BEECODE);              
           },
-          error:function(request,status,error){alert('fail to load!');} 
+          error:function(request,status,error){alert('fail to load3!');} 
   });
+}
+
+function getBEECODEList(BEECODE1,getBee)
+{
+var BEECODEList = [];  
+
+$.ajax({
+        url     : ServerUrl+""+'/getBEECODEList',
+        dataType : 'jsonp',
+        jsonp : 'callback',
+        data    : {'BEECODE': BEECODE1 },
+        type    : 'get',
+        timeout: 5000,
+        success : function(data) {     
+               getBee(data.result.BeeList);
+        },
+        error:function(request,status,error){alert('fail to load!4');} 
+});
 }
 
 function popupPhone(url) {
@@ -220,77 +266,170 @@ function popupPhone(url) {
   return false;
 } 
 
-function createConnection(){
+function createConnection(BEECODE){
 
 socket = io.connect(ServerUrl,{'forceNew':true });
 
 socket.on('connect', function (data) {  
 
-  try{  
-    serverOn(ServerUrl);
-  }
-  catch(e){}
-
-  for(var i  in Bees)
-  {
-    var initBee = function (BEECODE,position)
-    {  
+    try{  
+      serverOn(ServerUrl);
+    }
+    catch(e){}
+    
+    var initBee = function (BEECODE)
+    {
       try{
         onRecivedBeecode(BEECODE);
-        }
-        catch(e){}
-      Bees[position].BEECODE = BEECODE+""+Bees[position].key;
-      socket.emit('makeBee', {'roomName': Bees[position].BEECODE , "roomTitle" : Bees[position].url , "master":true}); 
-
-      if(scriptParam.badge)
+      }
+      catch(e){}
+      
+      for(var i  in Bees)
       {
-        var TopMargin = 250 + (100*position);
-        var goUrl = ServerUrl+"/bee/"+Bees[position].BEECODE;
-        $(document.body).append('<div onclick=popupPhone("'+goUrl+'") style="width:70px;height:70px;margin-top:'+TopMargin+'px;position: fixed;right:0;" ><center><img style="width:60px;height:55px;" src="'+ServerUrl+'/img/beebanner.png"></img><br><font color="red" size="1">'+Bees[position].url+'</font></center></div>');
+        Bees[i].BEECODE = BEECODE+""+Bees[i].key;
+        socket.emit('makeBee', {'roomName': Bees[i].BEECODE , "roomTitle" : Bees[i].url , "master":true}); 
+  
+        if(scriptParam.badge)
+        {
+          var TopMargin = 250 + (100*i);
+          var goUrl = ServerUrl+"/bee/"+Bees[i].BEECODE;
+          $(document.body).append('<div onclick=popupPhone("'+goUrl+'") style="width:70px;height:70px;margin-top:'+TopMargin+'px;position: fixed;right:0;" ><center><img style="width:60px;height:55px;" src="'+ServerUrl+'/img/beebanner.png"></img><br><font color="red" size="1">'+Bees[i].url+'</font></center></div>');
+        }
       }
     };
-    getBEECODE(initBee,i);
-  }
-});
+
+  if(BEECODE)
+    initBee(BEECODE);
+  else
+    getBEECODE(initBee);
+  
+  socket.on('clickBee', function (data) {
+  
+    //For IE
+    var BEECODE = data.BEECODE;
+    var click = parseInt(data.click);      
+    var MyBee = getBeeByBEECODE(BEECODE);
+    
+    try{
+       MyBee.buttonList[click-1].action();
+    }
+    catch(e){}
+  
+  });
+  
+  socket.on('sayBeeCallback', function (data) {
+    eval(data.functionCall);
+  });
+  
+  socket.on('getBee', function (data) {   
+
+      try{
+         OnGetBee();
+      }
+      catch(e){}
+      var Bee = getBeeByBEECODE(data.BEECODE);
+      socket.emit('initBee', {'TOBEE': data.TOBEE, 'BEECODE': data.BEECODE , 'Bee' : Bee });
+  });
+  
   socket.on('disconnect', function (data) {  
   try{  
     serverOff();
   }
   catch(e){}
+  });
 });
 
-socket.on('clickBee', function (data) {
-
-  //For IE
-  var BEECODE = data.BEECODE;
-  var click = parseInt(data.click);
-
-  var MyBee = getBeeByBEECODE(BEECODE);
-  
-  try{
-     MyBee.buttonList[click-1].action();
-  }
-  catch(e){}
-
-});
-
-socket.on('sayBeeCallback', function (data) {
-  eval(data.functionCall);
-});
-
-socket.on('getBee', function (data) {   
-
-    try{
-       OnGetBee();
-    }
-    catch(e){}
-    var Bee = getBeeByBEECODE(data.BEECODE);
-    //var buttonList = Bee.buttonList;
-    //alert(JSON.stringify(Bee));
-    socket.emit('initBEE', {'TOBEE': data.TOBEE, 'BEECODE': data.BEECODE , 'Bee' : Bee });
-});
 }
 
+  
+function createConnectionByBee(BEECODE)
+{
+  
+  socket = io.connect(ServerUrl , {'forceNew':true });
+
+  socket.on('connect', function (data) {
+
+
+    try{  
+      serverOn(ServerUrl);
+    }
+    catch(e){}
+
+    try{
+      onSearchBee();
+    }
+    catch(e){}
+    
+    var initBee = function (BEECODE)
+    {
+      try{
+        onRecivedBeecode(BEECODE);
+      }
+      catch(e){}
+      
+       var getBee = function(BEECODEList){
+        
+        if(BEECODEList.length==0)
+        {
+          try{
+          onNoBee();
+          }
+          catch(e){}      
+        }
+        
+        for(var i in BEECODEList)
+        {  
+          var BEECODEItem = BEECODEList[i].split("/");
+          socket.emit('getBee', { 'TOBEE' : socket.io.engine.id , 'FROMBEE' : BEECODEItem[1] , 'BEECODE' : BEECODEItem[0]}); 
+        }      
+      };  
+      getBEECODEList(BEECODE,getBee);
+    };
+
+    if(BEECODE)
+      initBee(BEECODE);
+    else
+      getBEECODE(initBee);
+
+    socket.on('initBee', function (data) {
+      
+        try{
+        onFindBee(data.Bee);
+        }
+        catch(e){}
+        var Bee = data.Bee; 
+        
+    });      
+
+    socket.on('sayBee', function (data) {     
+      var functionCall = data.functionCall;                
+      var functionData = data.functionData;
+      functionData = functionData.replace("_BEECODE_" , data.BEECODE);
+
+      eval(functionData);
+      eval(functionCall);
+    });
+
+    socket.on('clickBee', function (data) {
+    
+      //For IE
+      var BEECODE = data.BEECODE;
+      var click = parseInt(data.click);
+    
+      try{
+        onClickBee(BEECODE,click);
+        }
+        catch(e){}
+    });    
+    
+    socket.on('disconnect', function (data) {
+      try{  
+        serverOff();
+      }
+      catch(e){}
+      });    
+  });
+}        
 /*
 For ChromeCast
 For Ebook

@@ -1,5 +1,5 @@
  /* 
- BeeconJS JavaScript Library v0.0.1
+ BeeconJS JavaScript Library v0.1.0
  http://beeconjs.com/
  
  Copyright 2015, Dayyoung You
