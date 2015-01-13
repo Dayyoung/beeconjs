@@ -14,7 +14,7 @@ var Bee = function (url, key , strict) {
   this.buttonList = [];
   Bees.push(this);
   this.data = null;
-  this.strict = null;
+  this.strict = strict;
 }
 
 var BeeButton = function(mark,action) {
