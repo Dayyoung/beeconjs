@@ -7,13 +7,14 @@
  Visit http://beeconjs.com/license 
  */
 var Bees = [];
-var Bee = function (url, key) {
+var Bee = function (url, key , strict) {
   this.url = url;
   this.key = key;
   this.BEECODE = null;
   this.buttonList = [];
   Bees.push(this);
   this.data = null;
+  this.strict = null;
 }
 
 var BeeButton = function(mark,action) {
@@ -290,9 +291,16 @@ socket.on('connect', function (data) {
       
       for(var i  in Bees)
       {
-        Bees[i].BEECODE = BEECODE+""+Bees[i].key;
-        socket.emit('makeBee', {'roomName': Bees[i].BEECODE , "roomTitle" : Bees[i].url , "master":true}); 
-  
+        if(Bees[i].strict)
+        {      
+          Bees[i].BEECODE = Bees[i].key;
+          socket.emit('makeBee', {'roomName': Bees[i].BEECODE , "roomTitle" : Bees[i].url , "master":true}); 
+        }
+        else
+        {
+          Bees[i].BEECODE = BEECODE+""+Bees[i].key;
+          socket.emit('makeBee', {'roomName': Bees[i].BEECODE , "roomTitle" : Bees[i].url , "master":true}); 
+        }
         if(scriptParam.badge)
         {
           var TopMargin = 250 + (100*i);
@@ -311,14 +319,19 @@ socket.on('connect', function (data) {
   
     //For IE
     var BEECODE = data.BEECODE;
-    var click = parseInt(data.click);      
+    var click = parseInt(data.click);    
+
+    try{
+      onClickBee(BEECODE,click);
+      }
+      catch(e){}
+
     var MyBee = getBeeByBEECODE(BEECODE);
     
     try{
        MyBee.buttonList[click-1].action();
     }
     catch(e){}
-  
   });
   
   socket.on('sayBeeCallback', function (data) {
@@ -334,7 +347,29 @@ socket.on('connect', function (data) {
       var Bee = getBeeByBEECODE(data.BEECODE);
       socket.emit('initBee', {'TOBEE': data.TOBEE, 'BEECODE': data.BEECODE , 'Bee' : Bee });
   });
+
+  socket.on('initBee', function (data) {
+
+      try{
+      onFindBee(data.Bee);
+      }
+      catch(e){}
+      var Bee = data.Bee;       
+      
+  });        
+
+  socket.on('heyBee', function (data) {
   
+    var BEECODE = data.BEECODE;
+    var hey = data.hey;
+  
+    try{
+      onHeyBee(BEECODE,hey);
+      }
+      catch(e){}
+  });    
+
+
   socket.on('disconnect', function (data) {  
   try{  
     serverOff();
@@ -395,6 +430,15 @@ function createConnectionByBee(BEECODE)
     else
       getBEECODE(initBee);
 
+    socket.on('sayBee', function (data) {     
+      var functionCall = data.functionCall;                
+      var functionData = data.functionData;
+      functionData = functionData.replace("_BEECODE_" , data.BEECODE);
+
+      eval(functionData);
+      eval(functionCall);
+    });
+
     socket.on('initBee', function (data) {
       
         try{
@@ -404,15 +448,6 @@ function createConnectionByBee(BEECODE)
         var Bee = data.Bee; 
         
     });      
-
-    socket.on('sayBee', function (data) {     
-      var functionCall = data.functionCall;                
-      var functionData = data.functionData;
-      functionData = functionData.replace("_BEECODE_" , data.BEECODE);
-
-      eval(functionData);
-      eval(functionCall);
-    });
 
     socket.on('clickBee', function (data) {
     
